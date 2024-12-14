@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+恭喜你发现了界面上的隐藏消息！
+本站点基本所有前端页面均由GPT生成, 复用率极低
+ $$$$$$\                            $$\                             
+$$  __$$\                           $$ |                            
+$$ /  \__| $$$$$$\   $$$$$$\   $$$$$$$ |                            
+$$ |$$$$\ $$  __$$\ $$  __$$\ $$  __$$ |                            
+$$ |\_$$ |$$ /  $$ |$$ /  $$ |$$ /  $$ |                            
+$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |                            
+\$$$$$$  |\$$$$$$  |\$$$$$$  |\$$$$$$$ |                            
+ \______/  \______/  \______/  \_______|                            
+                                                                    
+                                            $$\                     
+                                            \__|                    
+$$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$$$$$$\  $$\ $$$$$$$\   $$$$$$\  
+$$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$ |$$  __$$\ $$  __$$\ 
+$$ / $$ / $$ |$$ /  $$ |$$ |  \__|$$ |  $$ |$$ |$$ |  $$ |$$ /  $$ |
+$$ | $$ | $$ |$$ |  $$ |$$ |      $$ |  $$ |$$ |$$ |  $$ |$$ |  $$ |
+$$ | $$ | $$ |\$$$$$$  |$$ |      $$ |  $$ |$$ |$$ |  $$ |\$$$$$$$ |
+\__| \__| \__| \______/ \__|      \__|  \__|\__|\__|  \__| \____$$ |
+                                                          $$\   $$ |
+                                                          \$$$$$$  |
+                                                           \______/ 
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vScore - 考试详情</title>
+    <script src="./vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .alert {
+            background-color: #d9edf7;
+            color: #31708f;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f4f4f9;
+            cursor: pointer;
+        }
+
+        .exam_item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exam_item h5 {
+            margin: 0;
+        }
+
+        .badge,
+        .label {
+            margin-right: 5px;
+        }
+
+        .toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: none;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.5s;
+        }
+        .toast.show {
+        display: block;
+        animation: fadeInOut 5s forwards;
+        opacity: 1; /* 完全显示 */
+        }
+        .toast.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        }
+        .toast.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        }
+        @keyframes fadeInOut {
+        0% { opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { opacity: 0; }
+        }
+
+        .label {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e9ecef;
+            color: #495057;
+            border-radius: 4px;
+            font-size: 0.9em;
+            line-height: 1.3em;
+        }
+
+        .exam-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: inherit;
+            transition: color 0.2s;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <nav style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+                <button @click="jumpToIndex();" class="btn">主页</button>
+                <h2 style="margin: 0;">考试详情</h2>
+                <div class="dropdown" style="position: relative;">
+                    <button class="btn" @click="toggleDropdown();" style="background-color: #007bff; color: white;">菜单</button>
+                      <div v-if="dropdownVisible" class="dropdown-menu" style="position: absolute; right: 0; background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 10px; z-index: 100; width: 100px;">
+                        <button @click="jumpToChangePwd();" class="btn" style="display: block; width: 100%; text-align: center; background-color: #f8f9fa; margin-top: 5px; ">修改密码</button>
+                        <button @click="jumpToBind();" class="btn" style="display: block; width: 100%; text-align: center; background-color: #f8f9fa; margin-top: 5px; ">修改绑定</button>
+                        <button @click="logout();" class="btn" style="display: block; width: 100%; text-align: center; background-color: #f8f9fa; margin-top: 5px; ">退出登录</button>
+                      </div>
+                  </div>
+            </nav>
+        </header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <a style="font-size: 1.8em; font-weight: bold; display: block;" id="exam_name"></a>
+                    <a style="display: block;">
+                        <p class="label">考试ID: <span id="exam_id"></span></p>
+                        <p class="label"><span id="exam_time"></span></p>
+                        <p class='label' id="exam_scoreBeforeGrading" style="display: none;">scoreBeforeGrading</p>
+                        <button class="btn label" @click="openFactors('-1');">考试数据</button>
+                        <button class="btn label" @click="openRanks('-1');">我的排名</button>
+                    </a>
+                    <div class="exam-details" style="margin-top: 3px; margin-bottom: 10px;">
+                        <span class="label" id="ed_lkall_-1" style="display: none;"></span>
+                        <span class="label" id="ed_all_-1" style="display: none; margin-top: 3px;"></span>
+                        <span class="label" id="ed_class_-1" style="display: none; margin-top: 3px;"></span>
+                        <span class="label" id="rk_-1" style="display: none; margin-top: 3px;"></span>
+                    </div>
+                </div>
+                <span style="font-weight: bold;">
+                    <span id="exam_score" style="font-size: 2.2em;">score</span>
+                    <span style="font-size: 1.8em; color: gray;">/</span>
+                    <span id="exam_manfen" style="font-size: 1.5em; color: gray;">manfen</span>
+                </span>
+            </div>
+            <div class="exam-list">
+                <div v-for="sub in filteredExams" :key="sub.id" class="exam_item">
+                    <div>
+                        <h5 style="font-size: 1.3em; margin-bottom: 10px;">
+                            <span class="exam-title">{{ sub.name }}</span>
+                            <span class="label" style="font-size: 0.6em; margin-bottom: 10px; margin-left: 10px;">科目ID: {{ sub.id }}</span>
+                            <span style="margin-left: 10px;" v-if="sub.gradingType === 1" class="label">赋分</span>
+                        </h5>
+                        <div class="exam-details">
+                            <button class="btn label" @click="openDtxq(sub.id, false);">答题详情</button>
+                            <button class="btn label" @click="openDtxq(sub.id, true);">错题详情</button>
+                            <button class="btn label" @click="openDtk(sub.id);">答题卡</button>
+                            <button class="btn label" @click="openFactors(sub.id);">考试数据</button>
+                            <button class="btn label" @click="openRanks(sub.id);">我的排名</button>
+                        </div>
+                        <div class="exam-details" style="margin-top: 3px;">
+                            <span class="label" :id="'ed_lkall_' + sub.id" style="display: none;"></span>
+                            <span class="label" :id="'ed_all_' + sub.id" style="display: none; margin-top: 3px;"></span>
+                            <span class="label" :id="'ed_class_' + sub.id" style="display: none; margin-top: 3px;"></span>
+                            <span class="label" :id="'rk_' + sub.id" style="display: none; margin-top: 3px;"></span>
+                        </div>
+                    </div>
+                    <span style="font-size: 1.8em; font-weight: bold;">
+                        <span v-if="sub.gradingType === 1">{{ sub.score }}(原{{ sub.scoreBeforeGrading }})</span>
+                        <span v-else>{{ sub.score }}</span>
+                        <span style="font-size: 0.8em; color: gray;">/{{ sub.manfen }}</span>
+                    </span>
+                </div>
+            </div>
+            <div class="exam-item">
+                <div class="exam-data">
+                    <!-- 此处预留 -->
+                </div>
+            </div>
+        </div>
+        <div :class="['toast', { show: toastVisible, success: isSuccess, error: !isSuccess }]">{{ message }}</div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const examId = parseInt(params.get('examId'), 10);
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    exams: [],
+                    searchKey: '',
+                    message: '',
+                    toastVisible: false,
+                    isSuccess: false,
+                    dropdownVisible: false
+                };
+            },
+            computed: {
+                filteredExams() {
+                    return this.exams.filter(exam => exam.name.includes(this.searchKey));
+                }
+            },
+            async mounted() {
+                await this.fetchExams();
+                await this.fetchExamsAdvanced();
+            },
+            methods: {
+                logout() {
+                    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    window.location.href = './login';
+                },
+                jumpToIndex() {
+                    window.location.href = './index';
+                },
+                jumpToExam(examid) {
+                    window.location.href = './exam?examId=' + examid;
+                },
+                jumpToBind() {
+                window.location.href = './hfs_bind';
+                },
+                jumpToChangePwd() {
+                window.location.href = './change_pwd';
+                },
+                toggleDropdown() {
+                    if (typeof this.dropdownVisible === 'undefined') {
+                    this.dropdownVisible = false;
+                    return;
+                    }
+                this.dropdownVisible = !this.dropdownVisible;
+                },
+                showMessage(message, success) {
+                    this.message = message;
+                    this.isSuccess = success;
+                    this.toastVisible = true;
+                    setTimeout(() => {
+                        this.toastVisible = false;
+                    }, 5000);
+                },
+                async openDtk(subid) {
+                    await this.fetchDtks(subid);
+                },
+                async openDtxq(subid, isCuoti) {
+                    await this.fetchDtxq(subid, isCuoti);
+                },
+                async openFactors(subid) {
+                    if (subid === '-1') {
+                        subidCleared = subid;
+                    } else {
+                        subidCleared = subid.split('-')[0];
+                    }
+
+                    const factors = this.infoAdvancedFactors;
+                    if (!factors) {
+                        this.showMessage('暂未获取到数据', false);
+                        return;
+                    }
+                    if (document.getElementById(`ed_class_${subid}`).style.display === 'block') {
+                        document.getElementById(`ed_lkall_${subid}`).style.display = 'none';
+                        document.getElementById(`ed_all_${subid}`).style.display = 'none';
+                        document.getElementById(`ed_class_${subid}`).style.display = 'none';
+                        return;
+                    } else {
+                        if (factors.data.factors[subidCleared].hasOwnProperty('lkall')) {
+                        maxScore = factors.data.factors[subidCleared].lkall.max;
+                        meanScore = factors.data.factors[subidCleared].lkall.mean;
+                        medianScore = factors.data.factors[subidCleared].lkall.median;
+                        totalNum = factors.data.factors[subidCleared].lkall.total;
+                        document.getElementById(`ed_lkall_${subid}`).innerText = `联考 | 最高分: ${maxScore}, 平均分: ${meanScore}, 中位分: ${medianScore}, 参考人数: ${totalNum}`;
+                        document.getElementById(`ed_lkall_${subid}`).style.display = 'block';
+                        }
+                        // all
+                        maxScore = factors.data.factors[subidCleared].all.max;
+                        meanScore = factors.data.factors[subidCleared].all.mean;
+                        medianScore = factors.data.factors[subidCleared].all.median;
+                        totalNum = factors.data.factors[subidCleared].all.total;
+                        document.getElementById(`ed_all_${subid}`).innerText = `学校 | 最高分: ${maxScore}, 平均分: ${meanScore}, 中位分: ${medianScore}, 参考人数: ${totalNum}`;
+                        document.getElementById(`ed_all_${subid}`).style.display = 'block';
+
+                        maxScore = factors.data.factors[subidCleared].class.max;
+                        meanScore = factors.data.factors[subidCleared].class.mean;
+                        medianScore = factors.data.factors[subidCleared].class.median;
+                        totalNum = factors.data.factors[subidCleared].class.total;
+                        document.getElementById(`ed_class_${subid}`).innerText = `班级 | 最高分: ${maxScore}, 平均分: ${meanScore}, 中位分: ${medianScore}, 参考人数: ${totalNum}`;
+                        document.getElementById(`ed_class_${subid}`).style.display = 'block';
+                        // 构造文本, 嵌入到页面中
+                        // console.log(factors);
+                    }
+                },
+                async openRanks(subid) {
+                    if (subid === '-1') {
+                        subidCleared = subid;
+                    } else {
+                        subidCleared = subid.split('-')[0];
+                    }
+
+                    const ranks = this.infoAdvanced;
+                    if (!ranks) {
+                        this.showMessage('暂未获取到数据', false);
+                        return;
+                    }
+                    if (document.getElementById(`rk_${subid}`).style.display === 'block') {
+                        document.getElementById(`rk_${subid}`).style.display = 'none';
+                        return;
+                    } else {
+                        const item = ranks.data.items[0].subjects.find(subject => subject.paperid == subidCleared);
+                        if (item) {
+                            showText = `学校排名: ${item.schoolRank}, 班级排名: ${item.classRank}`
+                            if (item.countyRank) {
+                                showText = `区县排名: ${item.countyRank}, ` + showText;
+                            }
+                            if (item.allRank) {
+                                showText = `联考排名: ${item.allRank}, ` + showText;
+                            }
+                            document.getElementById(`rk_${subid}`).innerText = showText;
+                            document.getElementById(`rk_${subid}`).style.display = 'block';
+                        } else {
+                            this.showMessage('未找到对应的排名数据', false);
+                        }
+                        // 构造文本, 嵌入到页面中
+                        // console.log(factors);
+                    }
+                },
+                async fetchDtks(subid) {
+                    try {
+                        const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+                        const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+                        if (!token || token.trim() === '') {
+                            window.location.href = './login';
+                            return;
+                        }
+                        const response = await fetch('https://v-api.nub.icu/hfs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'token': `${token}`
+                            },
+                            body: JSON.stringify({ type: 4, examid: examId, subjectid: subid })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.code === 502) {
+                            window.location.href = './login';
+                        } else if (result.code !== 200) {
+                            this.showMessage(result.message || 'An error occurred', false);
+                        } else {
+                            document.querySelector('.exam-data').innerHTML = result.data.url.map(url => `<img src="${url}" alt="Answer Picture" style="max-width: 100%; margin-bottom: 10px;">`).join('');
+                        }
+                    } catch (error) {
+                        this.showMessage('访问接口失败', false);
+                    }
+                },
+                async fetchDtxq(subid, isCuoti) {
+                    try {
+                        const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+                        const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+                        if (!token || token.trim() === '') {
+                            window.location.href = './login';
+                            return;
+                        }
+                        const response = await fetch('https://v-api.nub.icu/hfs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'token': `${token}`
+                            },
+                            body: JSON.stringify({ type: 4, examid: examId, subjectid: subid })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.code === 502) {
+                            window.location.href = './login';
+                        } else if (result.code !== 200) {
+                            this.showMessage(result.message || 'An error occurred', false);
+                        } else {
+                        if (isCuoti) {
+                            document.querySelector('.exam-data').innerHTML = result.data.questions
+                                .filter(question => question.score !== question.manfen)
+                                .map(question => `
+                                    <div class="exam_item">
+                                        <h5 style="font-size: 1.3em; margin-bottom: 10px;" class="exam-title">
+                                            <span>${question.name}</span>
+                                        </h5>
+                                        <span style="font-size: 1.8em; font-weight: bold;">
+                                            <span style="font-size: 0.5em;">
+                                                <span class="label">${question.type === 1 ? '主观题' : '客观题'}</span>
+                                                ${question.type === 2 ? `<span class="label">我的答案: ${question.myAnswer}</span>` : ''}
+                                                ${question.type === 2 ? `<span class="label">正确答案: ${question.answer}</span>` : ''}
+                                            </span>
+                                            <span>${question.score}</span>
+                                            <span style="font-size: 0.8em; color: gray;">/${question.manfen}</span>
+                                        </span>
+                                    </div>
+                                `).join('');
+                        } else {
+                            document.querySelector('.exam-data').innerHTML = result.data.questions.map(question => `
+                                <div class="exam_item">
+                                    <h5 style="font-size: 1.3em; margin-bottom: 10px;" class="exam-title">
+                                        <span>${question.name}</span>
+                                    </h5>
+                                    <span style="font-size: 1.8em; font-weight: bold;">
+                                        <span style="font-size: 0.5em;">
+                                            <span class="label">${question.type === 1 ? '主观题' : '客观题'}</span>
+                                            ${question.type === 2 ? `<span class="label">我的答案: ${question.myAnswer}</span>` : ''}
+                                            ${question.type === 2 ? `<span class="label">正确答案: ${question.answer}</span>` : ''}
+                                        </span>
+                                        <span>${question.score}</span>
+                                        <span style="font-size: 0.8em; color: gray;">/${question.manfen}</span>
+                                    </span>
+                                </div>
+                            `).join('');
+                        }
+                        }
+                    } catch (error) {
+                        this.showMessage('访问接口失败', false);
+                    }
+                },
+                async fetchExams() {
+                    try {
+                        const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+                        const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+                        if (!token || token.trim() === '') {
+                            window.location.href = './login';
+                            return;
+                        }
+                        const response = await fetch('https://v-api.nub.icu/hfs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'token': `${token}`
+                            },
+                            body: JSON.stringify({ type: 2, examid: examId })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.code === 502) {
+                            window.location.href = './login';
+                        } else if (result.code !== 200) {
+                            this.showMessage(result.message || 'An error occurred', false);
+                        } else {
+                            document.getElementById('exam_name').innerText = result.data.name;
+                            document.getElementById('exam_id').innerText = result.data.examId;
+                            document.getElementById('exam_manfen').innerText = result.data.manfen + ' 分';
+                            document.getElementById('exam_time').innerText = result.data.time;
+                            const scoreBeforeGrading = result.data.scoreBeforeGrading;
+                            const exam_mode = result.data.mode; // mode为3则为新高考
+                            if (exam_mode === 3) {
+                                document.getElementById('exam_score').innerText = result.data.score;
+                                document.getElementById('exam_scoreBeforeGrading').innerText = '原始分 ' + scoreBeforeGrading;
+                                document.getElementById('exam_scoreBeforeGrading').style.display = 'inline';
+                            } else {
+                                document.getElementById('exam_score').innerText = result.data.score;
+                            }
+                            this.exams = result.data.papers.map(sub => ({
+                                id: sub.paperId,
+                                name: sub.name,
+                                score: sub.score,
+                                scoreBeforeGrading: sub.scoreBeforeGrading,
+                                manfen: sub.manfen + ' 分',
+                                gradingType: sub.gradingType
+                            })).sort((a, b) => a.id.localeCompare(b.id));
+                        }
+                    } catch (error) {
+                        this.showMessage('访问接口失败', false);
+                    }
+                },
+                async fetchExamsAdvanced() {
+                    try {
+                        const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+                        const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+                        if (!token || token.trim() === '') {
+                            window.location.href = './login';
+                            return;
+                        }
+                        const response = await fetch('https://v-api.nub.icu/hfs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'token': `${token}`
+                            },
+                            body: JSON.stringify({ type: 5, examid: examId })
+                        });
+
+                        const result = await response.json();
+                        if (result.code === 502) {
+                            window.location.href = './login';
+                        } else if (result.code == 505) {
+                            // 学校不支持的模式
+                            this.infoAdvanced = [];
+                            this.infoAdvancedFactors = [];
+                            console.log('学校不支持考试数据查询');
+                        } else if (result.code !== 200) {
+                            this.showMessage(result.message || 'An error occurred', false);
+                        } else {
+                            this.infoAdvanced = result.data;
+                            this.infoAdvancedFactors = result.factor_data;
+                            // console.log('success')
+                        }
+                    } catch (error) {
+                        this.showMessage('访问接口失败', false);
+                        this.infoAdvanced = [];
+                        this.infoAdvancedFactors = [];
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

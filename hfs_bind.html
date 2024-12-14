@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 绑定某分数账号页面 -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vScore - 绑定账号</title>
+  <script src="./vue.global.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      height: 38px;
+    }
+    .login-container button[disabled] {
+      background-color: #a0c8f0;
+      cursor: not-allowed;
+    }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      position: absolute;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .toast.show {
+      display: block;
+      animation: fadeInOut 5s forwards;
+    }
+    .toast.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .toast.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="login-container">
+      <h2>绑定账号</h2>
+      <form @submit.prevent="handleLogin">
+        <select v-model="hfs_mode" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+            <option value=0>学生端</option>
+            <option value=1>家长端</option>
+        </select>
+        <input type="text" v-model="hfs_account" placeholder="在此处键入好分数用户名.." required>
+        <input type="password" v-model="hfs_password" placeholder="在此处键入好分数密码.." required>
+        <button type="submit" :disabled="isLoading">
+            <span v-if="isLoading" class="spinner"></span>
+            <span v-else>绑定账号</span>
+        </button>
+        <button type="button" @click="clearBinding();" :disabled="isLoading" style="margin-top: 5px; background-color: #6c757d; color: white;">
+          <span v-if="isLoading" class="spinner"></span>
+          <span v-else>清除绑定信息</span>
+        </button>
+      </form>
+    </div>
+    <div :class="['toast', { show: toastVisible, success: isSuccess, error: !isSuccess }]">{{ message }}</div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          hfs_account: '',
+          hfs_password: '',
+          hfs_mode: 0,
+          message: '',
+          toastVisible: false,
+          isLoading: false,
+          isSuccess: false
+        };
+      },
+      methods: {
+        async clearBinding() {
+          this.isLoading = true;
+          try {
+            const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+            const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+            if (!token || token.trim() === '') {
+              window.location.href = './login';
+              return;
+            }
+            const response = await fetch('https://v-api.nub.icu/bind', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'token': `${token}`
+              },
+              body: JSON.stringify({
+                unbind: '',
+              })
+            });
+
+            const result = await response.json();
+            if (result.code === 502) {
+              window.location.href = './login';
+            } else if (result.code !== 200) {
+              this.showMessage(result.message || 'An error occurred', false);
+              this.exams = [];
+            } else {
+              this.showMessage(result.message, true);
+              setTimeout(() => {
+                window.location.href = './index';
+              }, 1000);
+            }
+          } catch (error) {
+            this.showMessage('访问接口失败', false);
+          } finally {
+            this.isLoading = false;
+          }
+        },
+        async handleLogin() {
+          this.isLoading = true;
+          if (this.hfs_account.length < 6 || this.hfs_account.length > 20) {
+            this.showMessage('用户名应当在6到20个字符之间', false);
+            this.isLoading = false;
+            return;
+          }
+
+          if (this.hfs_password.length < 6 || this.hfs_password.length > 20) {
+            this.showMessage('密码应当在6到20个字符之间', false);
+            this.isLoading = false;
+            return;
+          }
+
+          try {
+            const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+            const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+            if (!token || token.trim() === '') {
+              window.location.href = './login';
+              return;
+            }
+            const response = await fetch('https://v-api.nub.icu/bind', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'token': `${token}`
+              },
+              body: JSON.stringify({
+                hfs_mode: this.hfs_mode,
+                hfs_account: this.hfs_account,
+                hfs_password: this.hfs_password
+              })
+            });
+
+            const result = await response.json();
+            if (result.code === 502) {
+              window.location.href = './login';
+            } else if (result.code !== 200) {
+              this.showMessage(result.message || 'An error occurred', false);
+              this.exams = [];
+            } else {
+              this.showMessage(result.message, true);
+              setTimeout(() => {
+                window.location.href = './index';
+              }, 1000);
+            }
+          } catch (error) {
+            this.showMessage('访问接口失败', false);
+          } finally {
+            this.isLoading = false;
+          }
+        },
+        showMessage(message, success) {
+          this.message = message;
+          this.isSuccess = success;
+          this.toastVisible = true;
+          setTimeout(() => {
+            this.toastVisible = false;
+          }, 5000);
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
