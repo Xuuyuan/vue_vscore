@@ -407,6 +407,7 @@ $$ | $$ | $$ |\$$$$$$  |$$ |      $$ |  $$ |$$ |$$ |  $$ |\$$$$$$$ |
                         } else {
                             document.querySelector('.exam-data').innerHTML = result.data.url.map(url => `<img src="${url}" alt="Answer Picture" style="max-width: 100%; margin-bottom: 10px;">`).join('');
                         }
+                        this.showMessage('答题卡卡面获取成功, 请将页面下拉查看', true);
                     } catch (error) {
                         this.showMessage('访问接口失败', false);
                     }
@@ -472,6 +473,7 @@ $$ | $$ | $$ |\$$$$$$  |$$ |      $$ |  $$ |$$ |$$ |  $$ |\$$$$$$$ |
                                 </div>
                             `).join('');
                         }
+                        this.showMessage('答题数据获取成功, 请将页面下拉查看', true);
                         }
                     } catch (error) {
                         this.showMessage('访问接口失败', false);
