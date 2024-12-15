@@ -17,7 +17,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>vScore - 考试列表</title>
-  <link rel="shortcut icon" type="image/x-icon" href="./public/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
   <script src="./vue.global.js"></script>
   <style>
     body {
@@ -155,8 +155,8 @@
       <nav style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
         <h2 style="margin: 0;">考试列表</h2>
         <div class="dropdown" style="position: relative;">
-          <button class="btn" @click="toggleDropdown();" style="background-color: #007bff; color: white;">菜单</button>
-            <div v-if="dropdownVisible" class="dropdown-menu" style="position: absolute; right: 0; background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 10px; z-index: 100; width: 100px;">
+          <button class="btn" @click="toggleDropdown();" style="background-color: #f8f9fa;"><img src="./src/icons/汉堡图标_hamburger-button.png" alt="菜单" style="height: 20px;"></button>
+            <div v-if="dropdownVisible" class="dropdown-menu" style="position: absolute; right: 0; background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 4px; padding: 10px; z-index: 100; width: 120px;">
               <button @click="jumpToChangePwd();" class="btn" style="display: block; width: 100%; text-align: center; background-color: #f8f9fa; margin-top: 5px; ">修改密码</button>
               <button @click="jumpToBind();" class="btn" style="display: block; width: 100%; text-align: center; background-color: #f8f9fa; margin-top: 5px; ">修改绑定</button>
               <button @click="logout();" class="btn" style="display: block; width: 100%; text-align: center; background-color: #f8f9fa; margin-top: 5px; ">退出登录</button>
@@ -172,19 +172,18 @@
             style="color: red;"> 前往绑定</span></span>
         <div v-for="exam in filteredExams" :key="exam.id" class="exam_item" @click="jumpToExam(exam.id)">
           <div>
-            <h5 class="exam-title" style="font-size: 1.1em; margin-bottom: 10px;">{{
-              exam.name }}</h5>
+            <h5 class="exam-title" style="font-size: 1.1em; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ exam.name }}</h5>
             <div class="exam-details">
-              <span class="label">ID {{ exam.id }}</span>
-              <span class="label">{{ exam.grade }}</span>
-              <span class="label">{{ exam.type }}</span>
-              <span class="label">{{ exam.date }}</span>
-              <span class="label">已出科目 {{ exam.paperCount }}</span>
-              <span v-if="exam.mode === 3" class="label">赋分考试</span>
+              <span class="label" style="margin-top: 5px;">ID {{ exam.id }}</span>
+              <span class="label" style="margin-top: 5px;">{{ exam.grade }}</span>
+              <span class="label" style="margin-top: 5px;">{{ exam.type }}</span>
+              <span class="label" style="margin-top: 5px;">{{ exam.date }}</span>
+              <span class="label" style="margin-top: 5px;">已出科目 {{ exam.paperCount }}</span>
+              <span v-if="exam.mode === 3" class="label" style="margin-top: 5px;">赋分考试</span>
             </div>
           </div>
-          <span style="font-size: 1.9em; font-weight: bold;">
-            {{ exam.score }}<span style="font-size: 0.8em; font-weight: lighter;">/{{ exam.manfen }}</span>
+          <span style="font-size: 1.6em; font-weight: bold;">
+            {{ exam.score }}<span style="font-size: 0.6em; font-weight: lighter;">/{{ exam.manfen }}</span>
           </span>
 
         </div>

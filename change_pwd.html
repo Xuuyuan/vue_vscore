@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>vScore - 修改密码</title>
-  <link rel="shortcut icon" type="image/x-icon" href="./public/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
   <script src="./vue.global.js"></script>
   <style>
     body {
@@ -131,6 +131,7 @@
           username: '',
           old_password: '',
           new_password: '',
+          new_password_re: '',
           message: '',
           toastVisible: false,
           isLoading: false,
@@ -140,42 +141,39 @@
       methods: {
         async handleChangePwd() {
           this.isLoading = true;
-          if (this.old_password !== this.new_password) {
+          if (this.old_password === this.new_password) {
+            this.showMessage('新密码不能和旧密码相同(前端返回)', false);
+            this.isLoading = false;
+            return;
+          } else if (this.new_password !== this.new_password_re) {
             this.showMessage('两次输入的新密码不一致', false);
             this.isLoading = false;
             return;
-          }
-
-          if (this.username.length < 8 || this.username.length > 20) {
+          } else if (this.username.length < 6 || this.username.length > 20) {
             this.showMessage('用户名应当在6到20个字符之间', false);
             this.isLoading = false;
             return;
-          }
-
-          if (this.old_password.length < 8 || this.old_password.length > 20) {
+          } else if (this.old_password.length < 8 || this.old_password.length > 20) {
             this.showMessage('旧密码应当在8到20个字符之间', false);
             this.isLoading = false;
             return;
-          }
-
-          if (this.new_password.length < 8 || this.new_password.length > 20) {
+          } else if (this.new_password.length < 8 || this.new_password.length > 20) {
             this.showMessage('新密码应当在8到20个字符之间', false);
             this.isLoading = false;
             return;
           }
-
           try {
             const response = await fetch('https://v-api.nub.icu/user', {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json',
-                'token': `${token}`
+                'Content-Type': 'application/json'
               },
               body: JSON.stringify({
                 method: 'change_password',
                 username: this.username,
                 old_password: this.old_password,
-                new_password: this.new_password
+                new_password: this.new_password,
+                new_password_re: this.new_password_re
               })
             });
 
@@ -192,7 +190,7 @@
               }, 1000);
             }
           } catch (error) {
-            this.showMessage('访问接口失败', false);
+            this.showMessage('访问接口失败: ' + error, false);
           } finally {
             this.isLoading = false;
           }
